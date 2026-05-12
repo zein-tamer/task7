@@ -88,7 +88,7 @@ const addToCart = async (req, res) => {
 
         await cart.save();
 
-        // 5. إرجاع الاستجابة  
+         
         res.status(200).json({
             success: true,
             cart: cart

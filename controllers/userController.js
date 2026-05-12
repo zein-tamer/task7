@@ -157,7 +157,7 @@ const userSendMessageToAdmin = async (req, res, next) => {
         if (admin.fcmToken) {
             await sendPushNotification(
                 admin.fcmToken,
-                "رسالة جديدة ✉️",
+                "رسالة جديدة",
                 `أرسل ${req.user.name}: ${content}`,
                 { type: "NEW_MESSAGE", senderId: senderId.toString() }
             );

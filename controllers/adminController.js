@@ -181,7 +181,7 @@ const getAdminUserConversation = async (req, res, next) => {
       { $set: { status: 'read' } }
     );
 
-    // 2. جلب الرسائل مع "ترطيب" البيانات (Populate) لجلب الأسماء
+    // 2. جلب الرسائل مع "ترتيب" البيانات (Populate) لجلب الأسماء
     const messages = await Message.find({
       $or: [
         { sender: adminId, receiver: userId },
@@ -261,7 +261,7 @@ const adminSendMessage = async (req, res, next) => {
         }
 
 
-        // 3. الحركة الاحترافية: جلب اسم المستلم فوراً بعد الإرسال
+        // 3.   جلب اسم المستلم فوراً بعد الإرسال
         const newMessage = await Message.findById(message._id)
             .populate('receiver', 'name email'); // ربط سريع لجلب بيانات المستلم
 

@@ -7,13 +7,13 @@ const orderSchema = new mongoose.Schema({
         required: true, 
         index: true 
     },
-    // 📍 ربط الطلب بعنوان المستخدم الذي اختاره
+    //  ربط الطلب بعنوان المستخدم الذي اختاره
     addressId: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Address', 
         required: true 
     },
-     // 📍 الحقل الجديد (لقطة ثابتة للعنوان وقت الشراء)
+     //  الحقل الجديد (لقطة ثابتة للعنوان وقت الشراء)
     shippingAddressSnapshot: {
         city: String,
         phone: String,
@@ -29,12 +29,12 @@ const orderSchema = new mongoose.Schema({
             image: String
         }
     ],
-    // 💰 المجموع النهائي بعد تطبيق الخصم
+    // المجموع النهائي بعد تطبيق الخصم
     totalAmount: { 
         type: Number, 
         required: true 
     },
-    // 🎫 بيانات الخصم والكوبونات
+    //  بيانات الخصم والكوبونات
     couponCode: { 
         type: String, 
         uppercase: true, 

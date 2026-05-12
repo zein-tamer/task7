@@ -25,7 +25,7 @@ router.post('/send-to-admin',   adminSendMessageToAdmin);
 router.get('/conversations', getAllConversations);
 
 router.get('/conversations/:userId',   getAdminUserConversation);
-router.delete('/conversations/:userId',   deleteConversation); // للأدمن لحذف المحادثة مع مستخدم
+router.delete('/conversations/:userId',   deleteConversation); 
 
 router.get('/order/:orderId', getOrderDetailsForAdmin);
 router.patch('/:orderId/status', updateOrderStatus);

@@ -24,13 +24,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 4. المسارات العامة (بدون حماية)
 app.use('/', require('./routes/root'));
 app.use('/api/auth', require('./routes/api/auth'));
-app.use('/api/product', require('./routes/api/product')); // إذا كانت رؤية المنتجات عامة
+app.use('/api/product', require('./routes/api/product')); 
 
 // 5. حماية المسارات التالية (المسارات التي تحتاج تسجيل دخول)
 app.use(verifyJWT);
 app.use('/api/user', require('./routes/api/user'));
 app.use('/api/cart', require('./routes/api/cart'));
 app.use('/api/admin', require('./routes/api/admin')); 
+
+
 // 6. معالجة الـ 404
 
 app.use((req, res) => {

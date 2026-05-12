@@ -223,7 +223,7 @@ const getProductStock = async (req, res) => {
 
         if (!product) return res.status(404).json({ message: "المنتج غير موجود" });
 
-        // إضافة منطق الوصف (Description Logic)
+        // إضافة منطق الوصف 
        let stockStatus = "";
 
            if (product.quantity === 0) {
