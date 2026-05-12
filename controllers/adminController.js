@@ -1,8 +1,9 @@
 
 const Product = require('../model/product');
 const User = require('../model/User');
+const Order = require('../model/Order');
 const Message = require('../model/Message');
-const { get } = require('mongoose');
+const ExcelJS = require('exceljs');
 
 
 
@@ -349,7 +350,107 @@ const newMessage = await Message.findById(message._id)
     }
 };
 
+const ordersToExcel = async (req, res, next) => {
+    try {
+        const orders = await Order.find()
+            .populate('userId', 'name email')
+            .sort({ createdAt: -1 })
+            .lean();
 
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('تقرير المبيعات التفصيلي');
+
+        // 1. إعدادات الأعمدة
+        worksheet.columns = [
+            { header: 'معرف الطلب', key: '_id', width: 25 },
+            { header: 'العميل', key: 'userName', width: 20 },
+            { header: 'البريد الإلكتروني', key: 'userEmail', width: 25 },
+            { header: 'تفاصيل المنتجات المشتراة', key: 'products', width: 65 },
+            { header: 'المبلغ الإجمالي', key: 'totalAmount', width: 15 },
+            { header: 'الحالة', key: 'status', width: 15 },
+            { header: 'تاريخ الطلب', key: 'createdAt', width: 25 }
+        ];
+
+        orders.forEach(order => {
+            // تجميع المنتجات مع التأكد من وجود المصفوفة
+            const productsSummary = order.items && order.items.length > 0 
+                ? order.items.map(item => `  • ${item.name} (${item.quantity})`).join('\n\n') 
+                : ' - ';
+
+            // --- التعديلات الجوهرية هنا لمنع الـ TypeError ---
+            const row = worksheet.addRow({
+                _id: order._id ? order._id.toString() : 'N/A',
+                userName: order.userId?.name || 'N/A',
+                userEmail: order.userId?.email || 'N/A',
+                products: productsSummary,
+                // التأكد من أن المبلغ رقم قبل استدعاء toLocaleString
+                totalAmount: order.totalAmount != null ? `${order.totalAmount.toLocaleString()} $` : '0 $',
+                status: order.status ? order.status.toUpperCase() : 'UNKNOWN',
+                // التأكد من وجود تاريخ صالح
+                createdAt: order.createdAt ? new Date(order.createdAt).toLocaleString('ar-EG') : 'غير محدد'
+            });
+
+            // 3. التحكم بارتفاع الصف
+            const lineCount = (order.items?.length || 1) * 2;
+            row.height = Math.max(45, lineCount * 18); 
+
+            // 4. تنسيق الخلية
+            const productsCell = row.getCell('products');
+            productsCell.alignment = { 
+                vertical: 'middle', 
+                horizontal: 'right', 
+                wrapText: true,
+                indent: 2 
+            };
+
+            // تنسيق الألوان بناءً على الحالة
+            const statusCell = row.getCell('status');
+            const colors = {
+                completed: 'FF008000',
+                cancelled: 'FFFF0000',
+                pending: 'FFFFA500',
+                shipped: 'FF2E75B6'
+            };
+            
+            const statusKey = order.status ? order.status.toLowerCase() : '';
+            if (colors[statusKey]) {
+                statusCell.font = { color: { argb: colors[statusKey] }, bold: true };
+            }
+            
+            // إضافة حدود ناعمة وتنسيق المحاذاة
+            row.eachCell((cell) => {
+                cell.border = {
+                    bottom: { style: 'thin', color: { argb: 'FFEEEEEE' } }
+                };
+                // محاذاة كل الخلايا للوسط ما عدا خلية تفاصيل المنتجات
+                if (cell.address.includes('D') === false) { 
+                    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                }
+            });
+        });
+
+        // 5. تنسيق رأس الجدول
+        const headerRow = worksheet.getRow(1);
+        headerRow.height = 40;
+        headerRow.eachCell((cell) => {
+            cell.font = { bold: true, size: 12, color: { argb: 'FFFFFFFF' } };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF203764' } };
+            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        });
+
+        // إرسال الملف
+        const fileName = `Export_Report_${new Date().toISOString().slice(0,10)}.xlsx`;
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+
+        await workbook.xlsx.write(res);
+        res.end();
+
+    } catch (error) {
+        console.error("Excel Export Error:", error); // تسجيل الخطأ في الكونسول للمتابعة
+        next(error);
+    }
+};
 module.exports = {
     adminSendMessageToAdmin,
     deleteConversation,
@@ -358,5 +459,6 @@ module.exports = {
     getAllConversations,
     getOrderDetailsForAdmin,
     getDashboardStats,
-    updateOrderStatus
+    updateOrderStatus,
+    ordersToExcel
 }

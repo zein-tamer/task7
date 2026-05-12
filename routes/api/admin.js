@@ -7,7 +7,8 @@ const {
     adminSendMessageToAdmin,
     getOrderDetailsForAdmin,
     getDashboardStats,
-    updateOrderStatus
+    updateOrderStatus,
+    ordersToExcel
  } = require('../../controllers/adminController');
 const verifyAdmin = require('../../middleware/verifyAdmin');
 
@@ -16,6 +17,7 @@ const verifyAdmin = require('../../middleware/verifyAdmin');
 router.use(verifyAdmin);
 
 router.get('/stats', getDashboardStats);
+router.get('/export-orders', ordersToExcel);
 
 router.post('/messages/send',   adminSendMessage);
 
