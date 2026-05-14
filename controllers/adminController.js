@@ -2,7 +2,7 @@
 const Product = require('../model/product');
 const User = require('../model/User');
 const Order = require('../model/Order');
-const Message = require('../model/Message');
+const Message = require('../model/message');
 const ExcelJS = require('exceljs');
 
 
