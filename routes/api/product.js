@@ -12,6 +12,7 @@ const {
         } = require('../../controllers/productController');
 
 const verifyAdmin = require('../../middleware/verifyAdmin');
+const verifyJWT = require('../../middleware/verifyJWT');
 
 
 // GET ALL
@@ -28,7 +29,7 @@ router.post('/:id/reviews', createProductReview);
 
 router.delete('/:id/reviews/:reviewId', deleteReview);
 
-
+router.use(verifyJWT);
 router.use(verifyAdmin);
 
 // CREATE PRODUCT
