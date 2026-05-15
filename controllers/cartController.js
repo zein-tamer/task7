@@ -103,7 +103,8 @@ const addToCart = async (req, res) => {
 
 const checkout = async (req, res) => {
     try {
-        const userId = req.user.id;
+        // جرب هذا السطر بدلاً من السطر القديم
+        const userId = req.user.id || req.user._id || req.user.userId;
 
         // 1. جلب العربة والتأكد أنها ليست فارغة
         const cart = await Cart.findOne({ userId });
