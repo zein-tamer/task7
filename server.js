@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser');
 
 const connectDB = require('./config/dbConn');
 const verifyJWT = require('./middleware/verifyJWT');
-
+const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -21,10 +21,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(cors({ origin: ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://127.0.0.1:5501', 'https://wondrous-sfogliatella-a94c8a.netlify.app'], credentials: true }));
 // 4. المسارات العامة (بدون حماية)
 app.use('/', require('./routes/root'));
 app.use('/api/auth', require('./routes/api/auth'));
-app.use('/api/product', require('./routes/api/product')); 
+app.use('/api/products', require('./routes/api/product')); 
 
 // 5. حماية المسارات التالية (المسارات التي تحتاج تسجيل دخول)
 app.use(verifyJWT);

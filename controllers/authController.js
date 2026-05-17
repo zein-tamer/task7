@@ -176,7 +176,7 @@ const RefreshToken = async (req, res) => {
       // 4) إرسال refresh token الجديد في cookie
       res.cookie("jwt", newRefreshToken, {
         httpOnly: true,
-        sameSite: "Strict",
+         sameSite: "Lax",
         secure: process.env.NODE_ENV === "production",
         maxAge: 7 * 24 * 60 * 60 * 1000
       });
